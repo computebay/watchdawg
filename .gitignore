@@ -1,0 +1,39 @@
+# Dependencies
+node_modules
+bun.lockb
+package-lock.json
+yarn.lock
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Build
+dist
+build
+*.js
+*.map
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Testing
+coverage
+.nyc_output
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Prisma
+.env.*.prisma
+.prisma
+.env
+/src/generated/prisma
