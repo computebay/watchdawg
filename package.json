@@ -27,6 +27,7 @@
     "@opentelemetry/exporter-logs-otlp-http": "^0.220.0",
     "@opentelemetry/auto-instrumentations-node": "^0.78.0",
     "pino": "^10.1.0",
+    "pino-loki": "^3.0.0",
     "prom-client": "^15.1.0",
     "amqplib": "^0.10.9"
   },

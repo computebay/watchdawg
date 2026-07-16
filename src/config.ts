@@ -5,6 +5,7 @@ export interface ObservabilityConfig {
   otlpEndpoint?: string;
   otlpHeaders?: Record<string, string>;
   logLevel?: string;
+  lokiUrl?: string;
 }
 
 export function loadObservabilityConfig(
@@ -17,5 +18,6 @@ export function loadObservabilityConfig(
     otlpEndpoint: overrides?.otlpEndpoint ?? process.env.OTEL_EXPORTER_OTLP_ENDPOINT ?? "http://localhost:4318",
     otlpHeaders: overrides?.otlpHeaders ?? undefined,
     logLevel: overrides?.logLevel ?? process.env.LOG_LEVEL ?? "info",
+    lokiUrl: overrides?.lokiUrl ?? process.env.LOKI_URL,
   };
 }

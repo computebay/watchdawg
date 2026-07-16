@@ -19,11 +19,15 @@ export function createLogger(
   config: ObservabilityConfig,
   extraBaseFields?: Record<string, unknown>,
 ): pino.Logger {
-  if (_baseLogger) return _baseLogger;
+  if (_baseLogger) {
+    const currentName = _baseLogger.bindings()?.["service.name"];
+    if (currentName !== "unknown") return _baseLogger;
+  }
 
   const isDev = config.environment !== "production";
+  const lokiUrl = config.lokiUrl;
 
-  _baseLogger = pino({
+  const pinoConfig: pino.LoggerOptions = {
     level: config.logLevel ?? "info",
     base: {
       "service.name": config.serviceName,
@@ -48,17 +52,50 @@ export function createLogger(
         return { level: label };
       },
     },
-    ...(isDev && {
-      transport: {
+  };
+
+  if (lokiUrl) {
+    const targets: pino.TransportTargetOptions[] = [
+      {
+        target: "pino-loki",
+        options: {
+          batchingInterval: 2,
+          replaceTimestamp: true,
+          lokiUrl,
+          labels: {
+            service_name: config.serviceName,
+            environment: config.environment,
+          },
+        },
+        level: config.logLevel ?? "info",
+      },
+    ];
+
+    if (isDev) {
+      targets.push({
         target: "pino-pretty",
         options: {
           colorize: true,
           translateTime: "SYS:standard",
           ignore: "pid,hostname",
         },
+        level: config.logLevel ?? "info",
+      });
+    }
+
+    pinoConfig.transport = { targets };
+  } else if (isDev) {
+    pinoConfig.transport = {
+      target: "pino-pretty",
+      options: {
+        colorize: true,
+        translateTime: "SYS:standard",
+        ignore: "pid,hostname",
       },
-    }),
-  });
+    };
+  }
+
+  _baseLogger = pino(pinoConfig);
 
   return _baseLogger;
 }
