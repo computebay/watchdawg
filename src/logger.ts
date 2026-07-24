@@ -25,7 +25,7 @@ export function createLogger(
   }
 
   const isDev = config.environment !== "production";
-  const lokiUrl = config.lokiUrl;
+  const lokiUrl = config.lokiUrl ?? process.env.LOKI_URL;
 
   const pinoConfig: pino.LoggerOptions = {
     level: config.logLevel ?? "info",
@@ -47,11 +47,6 @@ export function createLogger(
       }
       return {};
     },
-    formatters: {
-      level(label: string) {
-        return { level: label };
-      },
-    },
   };
 
   if (lokiUrl) {
@@ -59,12 +54,15 @@ export function createLogger(
       {
         target: "pino-loki",
         options: {
-          batchingInterval: 2,
+          host: lokiUrl,
+          batching: {
+            interval: 2,
+          },
           replaceTimestamp: true,
-          lokiUrl,
           labels: {
             service_name: config.serviceName,
             environment: config.environment,
+            service_version: config.serviceVersion,
           },
         },
         level: config.logLevel ?? "info",
@@ -108,6 +106,7 @@ export function getLogger(): pino.Logger {
       serviceVersion: process.env.SERVICE_VERSION ?? "0.0.0",
       environment: process.env.NODE_ENV ?? "development",
       logLevel: process.env.LOG_LEVEL ?? "info",
+      lokiUrl: process.env.LOKI_URL,
     });
   }
   return _baseLogger;

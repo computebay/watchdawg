@@ -54,10 +54,7 @@ export function instrumentedPublish(
   const headers: Record<string, string> = {};
   propagation.inject(context.active(), headers);
   if (Object.keys(headers).length > 0) {
-    messageProperties.headers = Buffer.from(
-      JSON.stringify(headers),
-      "utf-8",
-    );
+    messageProperties.headers = headers;
   }
 
   const startTime = Date.now();
@@ -132,7 +129,7 @@ export function instrumentedSendToQueue(
   const headers: Record<string, string> = {};
   propagation.inject(context.active(), headers);
   if (Object.keys(headers).length > 0) {
-    messageProperties.headers = Buffer.from(JSON.stringify(headers), "utf-8");
+    messageProperties.headers = headers;
   }
 
   try {
